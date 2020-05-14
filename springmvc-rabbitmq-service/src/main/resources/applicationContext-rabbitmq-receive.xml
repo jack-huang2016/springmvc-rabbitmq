@@ -1,0 +1,35 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+       xsi:schemaLocation="http://www.springframework.org/schema/rabbit
+	http://www.springframework.org/schema/rabbit/spring-rabbit.xsd
+	http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- 定义rabbitmq连接工厂 -->
+<!--    <rabbit:connection-factory id="connectionFactory" host="114.215.83.3" port="5672"
+                               username="test" password="123456" virtual-host="/vhost_mmr"/>-->
+    <rabbit:connection-factory id="rmq-connectionFactory" addresses="${rabbitmq.address}" />
+
+    <!-- 定义rabbitmq管理 -->
+    <rabbit:admin connection-factory="rmq-connectionFactory" />
+
+    <!-- 声明队列 ,
+    auto-declare : 设置为true(默认值)时，容器将使用RabbitAdmin重新声明所有 AMQP objects(队列，交换，绑定)，如果它在启动过程中检测到至少有一个队列丢失，可能是因为它是auto-delete或过期队列，但如果队列因任何原因丢失，重新声明将继续进行。要禁用此行为，请将此 property 设置为false。
+    durable : 队列中的消息是否持久化;
+    exclusive : 仅创建者可以使用的私有队列，断开后自动删除;
+    auto_delete : 当所有消费者客户端连接断开后，是否自动删除队列-->
+    <rabbit:queue id="que_cat" name="que_cat" auto-declare="true" durable="false" exclusive="false" auto-delete="false"/>
+    <rabbit:queue id="que_pig" name="que_pig" auto-declare="true" durable="false" exclusive="false" auto-delete="false"/>
+
+    <!-- 定义消费者 -->
+    <bean name="catHandler" class="com.test.sample.service.listener.CatHandler" />
+    <bean name="pigHandler" class="com.test.sample.service.listener.PigHandler" />
+
+    <!-- 定义消费者监听队列，当有消息到达时会通知监听在对应队列上的监听对象 -->
+    <!-- 配置属性 acknowledeg 值为"auto"表示自动应答；值为"manual" 表示手动应答 ，当消息处理失败时，会一直重发，直到消息处理成功 -->
+    <rabbit:listener-container connection-factory="rmq-connectionFactory" acknowledge="manual">
+        <rabbit:listener ref="catHandler" queues="que_cat" />
+        <rabbit:listener ref="pigHandler" queues="que_pig" />
+    </rabbit:listener-container>
+
+</beans>

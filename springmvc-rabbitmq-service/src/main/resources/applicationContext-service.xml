@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context.xsd
+    http://www.springframework.org/schema/aop
+    http://www.springframework.org/schema/aop/spring-aop.xsd
+    http://www.springframework.org/schema/tx
+    http://www.springframework.org/schema/tx/spring-tx.xsd
+    http://www.springframework.org/schema/mvc
+    http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+    <!-- 扫描本工程bean -->
+    <context:component-scan base-package="com.test.sample.service" />
+
+    <!-- 加载依赖dao层配置 -->
+    <import resource="classpath*:applicationContext-dao.xml" />
+    <!-- 加载rabbitmq接收配置，只有当前应用方为接收消息方才需要配置，当然一个应用既可以是消息的发送方，也可以是消息的接收方 -->
+    <import resource="classpath*:applicationContext-rabbitmq-receive.xml" />
+    <!-- 加载rabbitmq发送配置，只有当前应用方为发送消息方才需要配置，当然一个应用既可以是消息的发送方，也可以是消息的接收方 -->
+    <import resource="classpath*:applicationContext-rabbitmq-send.xml" />
+
+     <context:property-placeholder location="classpath:rabbitmq.properties" ignore-unresolvable="true"  ignore-resource-not-found="true" file-encoding="UTF-8"/>
+
+</beans>
