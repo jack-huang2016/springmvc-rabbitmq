@@ -20,16 +20,30 @@
     auto_delete : 当所有消费者客户端连接断开后，是否自动删除队列-->
     <rabbit:queue id="que_cat" name="que_cat" auto-declare="true" durable="false" exclusive="false" auto-delete="false"/>
     <rabbit:queue id="que_pig" name="que_pig" auto-declare="true" durable="false" exclusive="false" auto-delete="false"/>
+    <rabbit:queue id="que_dog" name="que_dog" auto-declare="true" durable="false" exclusive="false" auto-delete="false">
+        <!-- <rabbit:queue>中可配置<rabbit:queue-arguments>
+        <rabbit:queue-arguments>
+            <entry key="x-ha-policy" value="all" />
+        </rabbit:queue-arguments>-->
+    </rabbit:queue>
 
     <!-- 定义消费者 -->
     <bean name="catHandler" class="com.test.sample.service.listener.CatHandler" />
     <bean name="pigHandler" class="com.test.sample.service.listener.PigHandler" />
+    <bean name="dogHandler" class="com.test.sample.service.listener.DogHandler" />
 
     <!-- 定义消费者监听队列，当有消息到达时会通知监听在对应队列上的监听对象 -->
-    <!-- 配置属性 acknowledeg 值为"auto"表示自动应答；值为"manual" 表示手动应答 ，当消息处理失败时，会一直重发，直到消息处理成功 -->
-    <rabbit:listener-container connection-factory="rmq-connectionFactory" acknowledge="manual">
+    <!-- 可配置属性 acknowledeg 值为"auto"(默认值) 表示自动应答；值为"manual" 表示手动应答 ，当消息处理失败时，会一直重发，直到消息处理成功
+         可配置channel-transacted属性，比如channel-transacted="true" ，表示
+         可配置concurrency属性，比如concurrency="10" ，表示
+         可配置error-handler属性，比如error-handler="rabbitMqErrorHandler"，表示
+    -->
+    <rabbit:listener-container connection-factory="rmq-connectionFactory" >
         <rabbit:listener ref="catHandler" queues="que_cat" />
         <rabbit:listener ref="pigHandler" queues="que_pig" />
+        <rabbit:listener ref="dogHandler" queues="que_dog"  method="listen"/>
     </rabbit:listener-container>
+
+   <!-- <bean id="rabbitMqErrorHandler" class="com.yougou.app.mq.RabbitMqErrorHandler"/>-->
 
 </beans>

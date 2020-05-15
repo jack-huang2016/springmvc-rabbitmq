@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,6 +23,7 @@ import java.util.Map;
  */
 
 @Controller
+@RequestMapping("/rabbit")
 public class RabbitmqController {
     @Autowired
     private RabbitTemplate rabbitTemplate;
@@ -31,8 +31,8 @@ public class RabbitmqController {
     /**
      *@描述 路由模式测试
      */
-    @RequestMapping(method= RequestMethod.GET)
-    public void test(){
+    @RequestMapping(value="routing", method= RequestMethod.GET)
+    public void testRouting(){
         Map<String, String> map = new HashMap<String, String>();
         map.put("id", "1");
         map.put("name", "pig");
@@ -48,8 +48,8 @@ public class RabbitmqController {
     /**
      *@描述 主题模式测试
      */
-    @RequestMapping(method= RequestMethod.GET)
-    public void test2(){
+    @RequestMapping(value="topic", method= RequestMethod.GET)
+    public void testTopic(){
         Map<String, String> map = new HashMap<String, String>();
         map.put("id", "1");
         map.put("name", "pigAdd");
@@ -69,5 +69,15 @@ public class RabbitmqController {
         rabbitTemplate.convertAndSend("cat.update", map);
         map.put("name", "catDelete");
         rabbitTemplate.convertAndSend("cat.delete", map);
+    }
+
+    /**
+     * @描述 订阅模式测试
+     */
+    @RequestMapping(value="publish", method = RequestMethod.GET)
+    public void testPublish() {
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("name", "小红");
+        rabbitTemplate.convertAndSend(map);
     }
 }
